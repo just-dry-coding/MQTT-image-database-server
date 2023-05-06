@@ -17,7 +17,7 @@ def _on_connect_default(rc):
 
 
 ConnectCallback = NewType('ConnectCallback', Callable[[int], None])
-OnMessageCallback = NewType('OnMessageCallback', Callable[[bytes], None])
+MessageCallback = NewType('OnMessageCallback', Callable[[bytes], None])
 
 
 class MqttSubscriber:
@@ -25,14 +25,15 @@ class MqttSubscriber:
         self._client = self._connect_mqtt(
             broker_url, broker_port, id, on_connect)
 
-    def subscribe(self, topic: str, on_message_callback):
-        def on_message(client, userdata, msg):
-            f = open('receive.jpg', 'wb')
-            f.write(msg.payload)
-            f.close()
-            print('image received')
+    def subscribe(self, topic: str, on_message_callback: MessageCallback):
         self.client.subscribe(topic)
-        self.client.on_message = on_message
+        self.client.on_message = _create_on_message_callback(
+            on_message_callback)
+
+    def _create_message_callback(self, message_callback):
+        def _message_callback(client, userdata, msg):
+            message_callback(msg.payload)
+        return _message_callback
 
     def _connect_mqtt(self, broker_url, broker_port, id, connect_callback):
         client = mqtt_client.Client(id)
@@ -42,12 +43,12 @@ class MqttSubscriber:
 
     def _connect_blocking(self, client, broker_url, broker_port, connect_callback):
         connect_flag = MutableFlag(False)
-        client.on_connect = self._create_blocking_callback(
+        client.on_connect = self._creat_flagged_connect_callback(
             connect_callback, connect_flag)
         client.connect(broker_url, broker_port)
         self._wait_on_callback(client, connect_flag)
 
-    def _create_blocking_callback(self, connect_callback, connect_flag):
+    def _creat_flagged_connect_callback(self, connect_callback, connect_flag):
         def blocking_callback(client, userdata, flags, rc):
             connect_flag.value = True
             connect_callback(rc)
