@@ -1,4 +1,5 @@
-from paho.mqtt import client as mqtt_client, MQTTMessage
+from paho.mqtt import client as mqtt_client
+from paho.mqtt.client import MQTTMessage
 import uuid
 from typing import NewType, Callable, Any, Dict
 
@@ -8,15 +9,15 @@ class MutableFlag:
         self.value = value
 
 
-ConnectCallback = NewType(
-    '_', Callable[[mqtt_client, Any, Dict[str, Any], int], None])
-
-
-def _on_connect_default(client, userdata, flags, rc):
+def _on_connect_default(rc):
     if rc == 0:
         print('connected successfully')
     else:
         print(f'failed to connect with code {rc}')
+
+
+ConnectCallback = NewType('ConnectCallback', Callable[[int], None])
+OnMessageCallback = NewType('OnMessageCallback', Callable[[bytes], None])
 
 
 class MqttSubscriber:
@@ -24,8 +25,8 @@ class MqttSubscriber:
         self._client = self._connect_mqtt(
             broker_url, broker_port, id, on_connect)
 
-    def subscribe(topic: str, on_message_callback):
-        def on_message(self.client, userdata, msg):
+    def subscribe(self, topic: str, on_message_callback):
+        def on_message(client, userdata, msg):
             f = open('receive.jpg', 'wb')
             f.write(msg.payload)
             f.close()
@@ -49,7 +50,7 @@ class MqttSubscriber:
     def _create_blocking_callback(self, connect_callback, connect_flag):
         def blocking_callback(client, userdata, flags, rc):
             connect_flag.value = True
-            connect_callback(client, userdata, flags, rc)
+            connect_callback(rc)
         return blocking_callback
 
     def _wait_on_callback(self, client, connect_flag):

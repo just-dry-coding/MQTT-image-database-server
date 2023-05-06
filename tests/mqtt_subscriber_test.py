@@ -14,7 +14,7 @@ class MqttSubscriberTest(TestCase):
         assert mqtt_sub != None
 
     def test_connection(self):
-        def test_callback(client, userdata, flags, rc):
+        def test_callback(rc):
             assert rc == 0
 
         mqtt_sub = MqttSubscriber(
