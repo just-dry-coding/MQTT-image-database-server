@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "mqtt_subscriber": {
+      "type": "object",
+      "properties": {
+        "broker_url": {
+          "type": "string"
+        },
+        "broker_port": {
+          "type": "integer"
+        },
+        "topic": {
+          "type": "string"
+        }
+      },
+      "required": ["broker_url", "broker_port", "topic"]
+    },
+    "mongo_handler": {
+      "type": "object",
+      "properties": {
+        "connection_string": {
+          "type": "string"
+        },
+        "database": {
+          "type": "string"
+        }
+      },
+      "required": ["connection_string", "database"]
+    }
+  },
+  "required": ["mqtt_subscriber", "mongo_handler"]
+}
