@@ -31,5 +31,6 @@ class MongoHandlerTest(TestCase):
         absolute_path = path.join(current_dir, 'test_images', file_name)
         with open(absolute_path, 'rb') as file:
             success = mongo_handler.storeImage('test', file, file_name)
+        # cleanup done manually for now
 
         assert success
