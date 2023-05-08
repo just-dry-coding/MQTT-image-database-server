@@ -1,11 +1,15 @@
-from src.mqtt_subscriber import MqttSubscriber, ConnectCallback, _on_connect_default as _on_connect_mqtt
-from src.mongo_handler import MongoHandler, _on_connect_default as _on_connect_db
+# quickfix includes
+import sys  # noqa
+from os import path  # noqa
+
+current_directory = path.dirname(path.abspath(__file__))  # noqa
+sys.path.append(current_directory)  # noqa
+
+from mqtt_subscriber import MqttSubscriber, ConnectCallback, _on_connect_default as _on_connect_mqtt
+from mongo_handler import MongoHandler, _on_connect_default as _on_connect_db
 
 import jsonschema
 import json
-from os import path
-
-import sys
 
 
 class ImageDataBaseServer():
