@@ -25,9 +25,12 @@
         },
         "database": {
           "type": "string"
+        },
+        "collection": {
+          "type": "string"
         }
       },
-      "required": ["connection_string", "database"]
+      "required": ["connection_string", "database", "collection"]
     }
   },
   "required": ["mqtt_subscriber", "mongo_handler"]

@@ -24,15 +24,15 @@ class MongoHandler():
         todo: docu write interface and methods
     """
 
-    def __init__(self, connection_string: str, database: str, on_connect: ConnectCallback = _on_connect_default):
+    def __init__(self, connection_string: str, database: str, collection: str, on_connect: ConnectCallback = _on_connect_default):
         self.client = MongoClient(connection_string)
         self._check_connection(on_connect)
         self.database = self.client[database]
+        self.fs = GridFS(self.database, collection=collection)
 
-    def storeImage(self, collection: str, image_data: str, file_name: str) -> bool:
-        fs = GridFS(self.database, collection=collection)
-        file_id = fs.put(image_data, filename=file_name)
-        if fs.exists(file_id):
+    def store_image(self,  file_name: str, image_data: str) -> bool:
+        file_id = self.fs.put(image_data, filename=file_name)
+        if self.fs.exists(file_id):
             return True
         return False
 
@@ -44,17 +44,18 @@ class MongoHandler():
             on_connect(False, str(e))
 
 
-def main(connection_string, database, img_path, img_name):
+def main(connection_string, database, collection, img_path, img_name):
     mongo_handler = MongoHandler(connection_string, database)
     complete_path = path.join(img_path, img_name)
     with open(complete_path, 'rb') as file:
-        success = mongo_handler.storeImage(database, file, img_name)
+        success = mongo_handler.store_image(collection, file, img_name)
     print("success" if success else "failed")
 
 
 if __name__ == '__main__':
     connection_string = sys.argv[1]
     database = sys.argv[2]
-    img_path = sys.argv[3]
-    img_name = sys.argv[4]
-    main(connection_string, database, img_path, img_name)
+    collection = sys.argv[3]
+    img_path = sys.argv[4]
+    img_name = sys.argv[5]
+    main(connection_string, database, collection, img_path, img_name)

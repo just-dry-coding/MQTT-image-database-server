@@ -31,12 +31,11 @@ class ImageDataBaseServer():
         return config
 
     def _create_mongo_handler(self, config, on_connect):
-        return MongoHandler(config['connection_string'], config['database'], on_connect)
+        return MongoHandler(config['connection_string'], config['database'], config['collection'], on_connect)
 
     def _create_mqtt_sub(self, config, on_connect):
-        def on_message(msg):
-            # todo: provide filename with mqtt object sent
-            self.mongo_handler.storeImage(msg, 'any.jpg')
+        def on_message(filename, data):
+            self.mongo_handler.storeImage(data, filename)
         mqtt_sub = MqttSubscriber(
             config['broker_url'], config['broker_port'], on_connect=on_connect)
         mqtt_sub.subscribe(config['topic'], on_message)

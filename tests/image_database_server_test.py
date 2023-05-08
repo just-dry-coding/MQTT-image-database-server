@@ -17,7 +17,8 @@ config = '{ \
             }, \
             "mongo_handler":{ \
                 "connection_string": "", \
-                "database": "test" \
+                "database": "test", \
+                "collection": "test" \
             } \
         }'
 

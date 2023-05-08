@@ -1,7 +1,7 @@
 from paho.mqtt import client as mqtt_client
-from paho.mqtt.client import MQTTMessage
 from uuid import uuid4
 from typing import NewType, Callable
+import json
 
 import sys
 
@@ -19,7 +19,8 @@ def _on_connect_default(connected, error_msg):
 
 
 ConnectCallback = NewType('ConnectCallback', Callable[[bool, str], None])
-MessageCallback = NewType('OnMessageCallback', Callable[[bytes], None])
+# message callback is called with file name and bytes
+MessageCallback = NewType('OnMessageCallback', Callable[[str, str], None])
 
 
 class MqttSubscriber:
@@ -38,7 +39,9 @@ class MqttSubscriber:
 
     def _wrap_on_message(self, on_message):
         def _on_message(client, userdata, msg):
-            on_message(msg.payload)
+            payload = msg.payload.decode('utf-8')
+            data = json.loads(payload)
+            on_message(data['name'], data['data'])
         return _on_message
 
     def _connect_mqtt(self, broker_url, broker_port, id, connect):

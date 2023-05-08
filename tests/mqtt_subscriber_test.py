@@ -3,6 +3,8 @@ from unittest import TestCase
 from src.mqtt_subscriber import MqttSubscriber
 from .test_publisher import MqttTestPublisher
 
+import json
+
 
 BROKER_URL = 'broker.hivemq.com'
 BROKER_PORT = 1883
@@ -24,11 +26,14 @@ class MqttSubscriberTest(TestCase):
             BROKER_URL, BROKER_PORT, on_connect=test_callback)
 
     def test_subscription(self):
-        sent_message = 'test_message'
+        sent_message = json.dumps({'name': 'filename',
+                                   'data': 'encoded'})
+
         publisher = MqttTestPublisher(BROKER_URL, BROKER_PORT)
 
-        def test_on_message(msg):
-            assert msg == sent_message
+        def test_on_message(filename, data):
+            assert sent_message['name'] == filename
+            assert sent_message['data'] == data
 
         mqtt_sub = MqttSubscriber(
             BROKER_URL, BROKER_PORT)
