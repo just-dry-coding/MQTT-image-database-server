@@ -2,6 +2,7 @@ from pymongo import MongoClient
 from pymongo.errors import PyMongoError
 
 from gridfs import GridFS
+import base64
 
 from os import path
 import sys
@@ -31,7 +32,8 @@ class MongoHandler():
         self.fs = GridFS(self.database, collection=collection)
 
     def store_image(self,  file_name: str, image_data: str) -> bool:
-        file_id = self.fs.put(image_data, filename=file_name)
+        decoded_data = base64.b64decode(image_data)
+        file_id = self.fs.put(decoded_data, filename=file_name)
         if self.fs.exists(file_id):
             return True
         return False

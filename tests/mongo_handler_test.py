@@ -4,6 +4,8 @@ from src.mongo_handler import MongoHandler
 
 from os import environ, path
 
+import base64
+
 
 _connection_string = environ.get('TEST_DATABASE_CONNECTION_STRING')
 
@@ -30,7 +32,9 @@ class MongoHandlerTest(TestCase):
         file_name = 'image1.jpg'
         absolute_path = path.join(current_dir, 'test_images', file_name)
         with open(absolute_path, 'rb') as file:
-            success = mongo_handler.store_image(file_name, file)
+            file_data = file.read()
+        success = mongo_handler.store_image(
+            file_name, base64.b64encode(file_data))
         # cleanup done manually for now
 
         assert success
