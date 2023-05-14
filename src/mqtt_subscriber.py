@@ -47,7 +47,7 @@ class MqttSubscriber:
 
     def _wrap_on_message(self, on_message):
         def _on_message(client, userdata, msg):
-            payload = msg.payload.decode('utf-8')
+            payload = msg.payload.decode('utf-8')  # still base64 encoded
             data = json.loads(payload)
             on_message(data['name'], data['data'])
         return _on_message

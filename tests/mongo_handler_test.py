@@ -26,7 +26,8 @@ class MongoHandlerTest(TestCase):
         assert mongo_handler != None
 
     def test_store_image(self):
-        mongo_handler = MongoHandler(_connection_string, 'test', 'test')
+        mongo_handler = MongoHandler(
+            _connection_string, 'test', 'test')
 
         current_dir = path.dirname(path.abspath(__file__))
         file_name = 'image1.jpg'
@@ -35,6 +36,5 @@ class MongoHandlerTest(TestCase):
             file_data = file.read()
         success = mongo_handler.store_image(
             file_name, base64.b64encode(file_data))
-        # cleanup done manually for now
-
         assert success
+        # todo: cleanup
