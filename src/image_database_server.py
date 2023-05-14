@@ -39,7 +39,7 @@ class ImageDataBaseServer():
 
     def _create_mqtt_sub(self, config, on_connect):
         def on_message(filename, data):
-            self.mongo_handler.storeImage(data, filename)
+            self.mongo_handler.store_image(filename, data)
         mqtt_sub = MqttSubscriber(
             config['broker_url'], config['broker_port'], on_connect=on_connect)
         mqtt_sub.subscribe(config['topic'], on_message)

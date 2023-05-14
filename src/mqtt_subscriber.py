@@ -2,6 +2,10 @@ from paho.mqtt import client as mqtt_client
 from uuid import uuid4
 from typing import NewType, Callable
 import json
+import base64
+
+from PIL import Image
+import io
 
 import sys
 
@@ -18,6 +22,10 @@ def _on_connect_default(connected, error_msg):
         print(f'failed to connect mqtt subsciber because: {error_msg}')
 
 
+def _on_message_default(name, data):
+    print('message received')
+
+
 ConnectCallback = NewType('ConnectCallback', Callable[[bool, str], None])
 # message callback is called with file name and bytes
 MessageCallback = NewType('OnMessageCallback', Callable[[str, str], None])
@@ -31,11 +39,11 @@ class MqttSubscriber:
         self._client = self._connect_mqtt(
             broker_url, broker_port, id, on_connect)
 
-    def subscribe(self, topic: str, on_message: MessageCallback):
+    def subscribe(self, topic: str, on_message: MessageCallback = _on_message_default):
         self._client.subscribe(topic)
         self._client.on_message = self._wrap_on_message(
             on_message)
-        self._client.loop_forever()
+        self._client.loop_start()
 
     def _wrap_on_message(self, on_message):
         def _on_message(client, userdata, msg):
@@ -79,9 +87,18 @@ class MqttSubscriber:
 def main(broker_url, broker_port, topic):
     subscriber = MqttSubscriber(broker_url, broker_port)
 
-    def on_message(msg):
-        print(msg)
+    def on_message(filename, data):
+        decoded_data = base64.b64decode(data)
+        image_stream = io.BytesIO(decoded_data)
+        image = Image.open(image_stream)
+        image.save(filename, 'PNG')
+
     subscriber.subscribe(topic, on_message)
+    while True:
+        try:
+            pass
+        except KeyboardInterrupt:
+            break
 
 
 if __name__ == '__main__':

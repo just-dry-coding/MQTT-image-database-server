@@ -8,7 +8,7 @@ import json
 
 BROKER_URL = 'broker.hivemq.com'
 BROKER_PORT = 1883
-TOPIC = 'one/unique/nice/test/topic'
+TOPIC = 'my/super/test/unique/topic'
 
 
 class MqttSubscriberTest(TestCase):
@@ -32,8 +32,9 @@ class MqttSubscriberTest(TestCase):
         publisher = MqttTestPublisher(BROKER_URL, BROKER_PORT)
 
         def test_on_message(filename, data):
-            assert sent_message['name'] == filename
-            assert sent_message['data'] == data
+            sent_message_json = json.loads(sent_message)
+            assert sent_message_json['name'] == filename
+            assert sent_message_json['data'] == data
 
         mqtt_sub = MqttSubscriber(
             BROKER_URL, BROKER_PORT)
