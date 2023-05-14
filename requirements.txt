@@ -6,6 +6,7 @@ iniconfig==2.0.0
 jsonschema==4.17.3
 packaging==23.1
 paho-mqtt==1.6.1
+Pillow==9.5.0
 pluggy==1.0.0
 pymongo==4.3.3
 pyrsistent==0.19.3
